@@ -7,10 +7,6 @@ Sphere::Sphere(float radius) {
     indices.clear();
     normals.clear();
     texCoords.clear();
-}
-
-void Sphere::renderSphere() {
-    unsigned int VAO, EBO, VBO;
 
     glGenVertexArrays(1, &VAO);
 
@@ -24,9 +20,9 @@ void Sphere::renderSphere() {
         for (unsigned int y = 0; y <= Y_SEGMENTS; ++y) {
             float xSegment = (float)x / (float)X_SEGMENTS;
             float ySegment = (float)y / (float)Y_SEGMENTS;
-            float xPos = std::cos(xSegment * 2.0f * PI) * std::sin(ySegment * PI);
-            float yPos = std::cos(ySegment * PI);
-            float zPos = std::sin(xSegment * 2.0f * PI) * std::sin(ySegment * PI);
+            float xPos = std::cos(xSegment * 2.0f * PI) * std::sin(ySegment * PI) * radius;
+            float yPos = std::cos(ySegment * PI) * radius;
+            float zPos = std::sin(xSegment * 2.0f * PI) * std::sin(ySegment * PI) * radius;
 
             vertices.push_back(glm::vec3(xPos, yPos, zPos));
             texCoords.push_back(glm::vec2(xSegment, ySegment));
@@ -37,7 +33,7 @@ void Sphere::renderSphere() {
     bool oddRow = false;
     for (unsigned int y = 0; y < Y_SEGMENTS; ++y)
     {
-        if (!oddRow) // even rows: y == 0, y == 2; and so on
+        if (!oddRow)
         {
             for (unsigned int x = 0; x <= X_SEGMENTS; ++x)
             {
@@ -57,7 +53,6 @@ void Sphere::renderSphere() {
     }
     indexCount = static_cast<unsigned int>(indices.size());
 
-    std::vector<float> data;
     for (unsigned int i = 0; i < vertices.size(); ++i)
     {
         data.push_back(vertices[i].x);
@@ -75,6 +70,9 @@ void Sphere::renderSphere() {
             data.push_back(texCoords[i].y);
         }
     }
+}
+
+void Sphere::renderSphere() {
     glBindVertexArray(VAO);
     glBindBuffer(GL_ARRAY_BUFFER, VBO);
     glBufferData(GL_ARRAY_BUFFER, data.size() * sizeof(float), &data[0], GL_STATIC_DRAW);

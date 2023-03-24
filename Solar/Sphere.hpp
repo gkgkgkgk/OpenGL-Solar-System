@@ -9,9 +9,13 @@ public:
 	std::vector<int> indices;
 	std::vector<glm::vec3> normals;
 	std::vector<glm::vec2> texCoords;
+	std::vector<float> data;
+
+	unsigned int VAO, EBO, VBO;
 
 	int indexCount = 0;
 
+	Sphere() {};
 	Sphere(float radius);
 	void renderSphere();
 };

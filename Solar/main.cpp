@@ -8,7 +8,9 @@
 #include <iostream>
 #include <string>
 #include <vector>
-#include "Sphere.hpp"
+#include "Camera.hpp"
+#include "Galaxy.hpp"
+#include "Shader.h"
 
 const unsigned int SCR_WIDTH = 800;
 const unsigned int SCR_HEIGHT = 800;
@@ -16,6 +18,13 @@ float deltaTime = 0.0;
 
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
 int load_shaders(std::string vertexShaderPath, std::string fragmentShaderPath);
+void mouse_callback(GLFWwindow* window, double xpos, double ypos);
+
+float lastX = -1;
+float lastY = -1;
+Camera camera;
+bool firstMouse = true;
+Planet sun;
 
 int main()
 {
@@ -40,13 +49,24 @@ int main()
 		return -1;
 	}
 
-	// load shaders
-	int programID = load_shaders("./vert.vertexshader", "./frag.fragmentshader");
+	Shader planetShader("./vert.vertexshader", "./frag.fragmentshader");
 
 	glEnable(GL_DEPTH_TEST);
+	glfwSetCursorPosCallback(window, mouse_callback);
 
-	// get cube vertices, load them into a vbo
-	Sphere sphere = Sphere(1.0);
+	sun = Planet(2.0e30, 1);
+	camera = Camera(20.0f);
+	camera.updateCameraPos(0, 0);
+	Galaxy galaxy = Galaxy(sun);
+
+	Planet p = Planet(5.972e24, 0.2, 150e6, sun);
+	galaxy.addPlanet(p);
+
+	Planet p2 = Planet(5.972e24, 0.1, 48e6, sun);
+	galaxy.addPlanet(p2);
+
+	Planet p3 = Planet(5.972e24, 0.3, 96e6, sun);
+	galaxy.addPlanet(p3);
 
 	glm::mat4 model = glm::mat4(1.0f);
 
@@ -59,29 +79,17 @@ int main()
 		if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
 			glfwSetWindowShouldClose(window, true);
 
-		glClearColor(0.25f, 0.25f, 0.25f, 1.0f);
+		glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-		glUseProgram(programID);
+		planetShader.use();
 
 		glm::mat4 projection = glm::perspective(glm::radians(45.0f), (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.1f, 100.0f);
-		const float radius = 10.0f;
-
-		glm::mat4 view = glm::lookAt(glm::vec3(0,0,10), glm::vec3(0.0f), glm::vec3(0, 1, 0));
 		
-		model = glm::rotate(model, deltaTime, glm::vec3(1.0f, 1.0f, 0.0f));
+		planetShader.setMat4("projection", projection);
+		planetShader.setMat4("view", camera.view);
 
-		glUniformMatrix4fv(glGetUniformLocation(programID, "projection"), 1, GL_FALSE, &projection[0][0]);
-		glUniformMatrix4fv(glGetUniformLocation(programID, "view"), 1, GL_FALSE, &view[0][0]);
-		glUniformMatrix4fv(glGetUniformLocation(programID, "model"), 1, GL_FALSE, &model[0][0]);
-
-
-		// load each model and draw each subcube
-		sphere.renderSphere();
-
-		glUniformMatrix4fv(glGetUniformLocation(programID, "model"), 1, GL_FALSE, &glm::translate(glm::mat4(1.0f), glm::vec3(3.0f, 0.0f, 0.0f))[0][0]);
-		sphere.renderSphere();
-
+		galaxy.renderGalaxy(planetShader, deltaTime);
 
 		glfwSwapBuffers(window);
 		glfwPollEvents();
@@ -99,74 +107,33 @@ void framebuffer_size_callback(GLFWwindow* window, int width, int height)
 	glViewport(0, 0, width, height);
 }
 
-int load_shaders(std::string vertexShaderPath, std::string fragmentShaderPath) {
-	std::string vertexShaderCode;
-	std::ifstream vertexShaderStream(vertexShaderPath, std::ios::in);
-	if (vertexShaderStream.is_open()) {
-		std::string Line = "";
-		while (getline(vertexShaderStream, Line))
-			vertexShaderCode += "\n" + Line;
-		vertexShaderStream.close();
+void mouse_callback(GLFWwindow* window, double xposIn, double yposIn)
+{
+	float xpos = static_cast<float>(xposIn);
+	float ypos = static_cast<float>(yposIn);
+
+	if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_LEFT) == GLFW_PRESS) // right click for rotating camera
+	{
+		glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+
+		if (firstMouse)
+		{
+			lastX = xpos;
+			lastY = ypos;
+			firstMouse = false;
+		}
+
+		float xoffset = xpos - lastX;
+		float yoffset = lastY - ypos;
+		lastX = xpos;
+		lastY = ypos;
+
+		camera.updateCameraPos(xoffset, yoffset);
 	}
 	else {
-		std::cout << "Impossible to open " << vertexShaderPath << ".\n";
-		return 0;
+		glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
+		lastX = -1;
+		lastY = -1;
+		firstMouse = true;
 	}
-
-	char const* vertexShaderSource = vertexShaderCode.c_str();
-
-	unsigned int vertexShader = glCreateShader(GL_VERTEX_SHADER);
-	glShaderSource(vertexShader, 1, &vertexShaderSource, NULL);
-	glCompileShader(vertexShader);
-	// check for shader compile errors
-	int success;
-	char infoLog[512];
-	glGetShaderiv(vertexShader, GL_COMPILE_STATUS, &success);
-	if (!success)
-	{
-		glGetShaderInfoLog(vertexShader, 512, NULL, infoLog);
-		std::cout << "ERROR::SHADER::VERTEX::COMPILATION_FAILED\n" << infoLog << std::endl;
-	}
-
-	// fragment shader
-	std::string fragmentShaderCode;
-	std::ifstream fragmentShaderStream(fragmentShaderPath, std::ios::in);
-	if (fragmentShaderStream.is_open()) {
-		std::string Line = "";
-		while (getline(fragmentShaderStream, Line))
-			fragmentShaderCode += "\n" + Line;
-		fragmentShaderStream.close();
-	}
-	else {
-		std::cout << "Impossible to open " << fragmentShaderPath << ".\n";
-		return 0;
-	}
-
-	char const* fragmentShaderSource = fragmentShaderCode.c_str();
-
-	unsigned int fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
-	glShaderSource(fragmentShader, 1, &fragmentShaderSource, NULL);
-	glCompileShader(fragmentShader);
-	// check for shader compile errors
-	glGetShaderiv(fragmentShader, GL_COMPILE_STATUS, &success);
-	if (!success)
-	{
-		glGetShaderInfoLog(fragmentShader, 512, NULL, infoLog);
-		std::cout << "ERROR::SHADER::FRAGMENT::COMPILATION_FAILED\n" << infoLog << std::endl;
-	}
-	// link shaders
-	unsigned int shaderProgram = glCreateProgram();
-	glAttachShader(shaderProgram, vertexShader);
-	glAttachShader(shaderProgram, fragmentShader);
-	glLinkProgram(shaderProgram);
-	// check for linking errors
-	glGetProgramiv(shaderProgram, GL_LINK_STATUS, &success);
-	if (!success) {
-		glGetProgramInfoLog(shaderProgram, 512, NULL, infoLog);
-		std::cout << "ERROR::SHADER::PROGRAM::LINKING_FAILED\n" << infoLog << std::endl;
-	}
-	glDeleteShader(vertexShader);
-	glDeleteShader(fragmentShader);
-
-	return shaderProgram;
 }

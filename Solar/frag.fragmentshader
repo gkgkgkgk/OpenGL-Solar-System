@@ -1,6 +1,16 @@
 #version 330 core
 out vec4 FragColor;
 
+in vec3 Normal;
+
+struct Light {
+    vec3 position;
+    vec3 diffuse;
+}
+
 void main(){
+    vec3 ambient = light.ambient
+
+
     FragColor = vec4(vec3(1, 1, 1), 1.0f);
 }
