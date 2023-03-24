@@ -136,6 +136,7 @@
     <ClCompile Include="Galaxy.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="Planet.cpp" />
+    <ClCompile Include="Sphere.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="frag.fragmentshader" />
@@ -144,6 +145,7 @@
   <ItemGroup>
     <ClInclude Include="Galaxy.hpp" />
     <ClInclude Include="Planet.hpp" />
+    <ClInclude Include="Sphere.hpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
