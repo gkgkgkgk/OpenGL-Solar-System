@@ -1,6 +1,11 @@
 #include <glm/glm.hpp>
 #include <glm/ext.hpp>
 #include <iostream>
+#include <string>
+#include <vector>
+#include "stb_image.hpp"
+#include "Shader.h"
+
 
 class Camera {
 public:
@@ -10,8 +15,14 @@ public:
 	float yaw = 0;
 	float pitch = 0;
 	float radius = 5.0;
-	
+	unsigned int skyboxVAO, skyboxVBO;
+	unsigned int cubemapTexture;
+
+
 	Camera() {};
 	Camera(float radius);
 	void updateCameraPos(float x, float y);
+	void initializeSkybox(Shader &skyShader);
+	void renderSkybox(Shader &skyShader);
+	unsigned int loadCubemap(std::vector<std::string> faces);
 };

@@ -12,12 +12,14 @@
 #include "Galaxy.hpp"
 #include "Shader.h"
 
+#define STB_IMAGE_IMPLEMENTATION
+#include "stb_image.hpp"
+
 const unsigned int SCR_WIDTH = 800;
 const unsigned int SCR_HEIGHT = 800;
 float deltaTime = 0.0;
 
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
-int load_shaders(std::string vertexShaderPath, std::string fragmentShaderPath);
 void mouse_callback(GLFWwindow* window, double xpos, double ypos);
 
 float lastX = -1;
@@ -49,7 +51,9 @@ int main()
 		return -1;
 	}
 
+	Shader skyShader("./sky.vertexshader", "./sky.fragmentshader");
 	Shader planetShader("./vert.vertexshader", "./frag.fragmentshader");
+	Shader sunShader("./sun.vertexshader", "./sun.fragmentshader");
 
 	glEnable(GL_DEPTH_TEST);
 	glfwSetCursorPosCallback(window, mouse_callback);
@@ -57,6 +61,7 @@ int main()
 	sun = Planet(2.0e30, 1);
 	camera = Camera(20.0f);
 	camera.updateCameraPos(0, 0);
+	camera.initializeSkybox(skyShader);
 	Galaxy galaxy = Galaxy(sun);
 
 	Planet p = Planet(5.972e24, 0.2, 150e6, sun);
@@ -82,19 +87,30 @@ int main()
 		glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-		planetShader.use();
-
 		glm::mat4 projection = glm::perspective(glm::radians(45.0f), (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.1f, 100.0f);
 		
+		planetShader.use();
+		planetShader.setVec3("light.ambient", 0.1f, 0.1f, 0.1f);
+		planetShader.setVec3("light.diffuse", 10.0f, 10.0f, 10.0f);
 		planetShader.setMat4("projection", projection);
 		planetShader.setMat4("view", camera.view);
 
-		galaxy.renderGalaxy(planetShader, deltaTime);
+		sunShader.use();
+		sunShader.setMat4("projection", projection);
+		sunShader.setMat4("view", camera.view);
+
+		galaxy.renderGalaxy(planetShader, sunShader, deltaTime);
+
+		skyShader.use();
+		skyShader.setMat4("projection", projection);
+		skyShader.setMat4("view", camera.view);
+		camera.renderSkybox(skyShader);
 
 		glfwSwapBuffers(window);
 		glfwPollEvents();
 
 		prevTime = currentTime;
+
 	}
 
 
@@ -112,7 +128,7 @@ void mouse_callback(GLFWwindow* window, double xposIn, double yposIn)
 	float xpos = static_cast<float>(xposIn);
 	float ypos = static_cast<float>(yposIn);
 
-	if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_LEFT) == GLFW_PRESS) // right click for rotating camera
+	if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_LEFT) == GLFW_PRESS)
 	{
 		glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 
@@ -129,6 +145,7 @@ void mouse_callback(GLFWwindow* window, double xposIn, double yposIn)
 		lastY = ypos;
 
 		camera.updateCameraPos(xoffset, yoffset);
+		std::cout << camera.position.x << ", " << camera.position.y << ", " << camera.position.z << std::endl;
 	}
 	else {
 		glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);

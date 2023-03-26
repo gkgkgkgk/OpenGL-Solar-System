@@ -9,5 +9,6 @@ public:
 	Galaxy() {};
 	Galaxy(Planet& sun);
 	void addPlanet(Planet& planet);
-	void renderGalaxy(Shader &planetShader, float deltaTime);
+	void renderGalaxy(Shader &planetShader, Shader& sunShader, float deltaTime);
+	void renderGalaxy(Shader& skyShader);
 };

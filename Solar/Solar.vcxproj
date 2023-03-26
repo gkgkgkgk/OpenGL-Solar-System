@@ -141,6 +141,10 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="frag.fragmentshader" />
+    <None Include="sky.fragmentshader" />
+    <None Include="sky.vertexshader" />
+    <None Include="sun.fragmentshader" />
+    <None Include="sun.vertexshader" />
     <None Include="vert.vertexshader" />
   </ItemGroup>
   <ItemGroup>
@@ -149,6 +153,7 @@
     <ClInclude Include="Planet.hpp" />
     <ClInclude Include="Shader.h" />
     <ClInclude Include="Sphere.hpp" />
+    <ClInclude Include="stb_image.hpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
