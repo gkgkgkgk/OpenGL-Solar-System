@@ -145,7 +145,6 @@ void mouse_callback(GLFWwindow* window, double xposIn, double yposIn)
 		lastY = ypos;
 
 		camera.updateCameraPos(xoffset, yoffset);
-		std::cout << camera.position.x << ", " << camera.position.y << ", " << camera.position.z << std::endl;
 	}
 	else {
 		glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
