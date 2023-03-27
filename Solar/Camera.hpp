@@ -17,7 +17,7 @@ public:
 	float radius = 5.0;
 	unsigned int skyboxVAO, skyboxVBO;
 	unsigned int cubemapTexture;
-
+	unsigned int bloomTexture;
 
 	Camera() {};
 	Camera(float radius);

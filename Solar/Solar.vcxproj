@@ -138,6 +138,7 @@
     <ClCompile Include="main.cpp" />
     <ClCompile Include="Planet.cpp" />
     <ClCompile Include="Sphere.cpp" />
+    <ClCompile Include="Sun.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="frag.fragmentshader" />
@@ -154,6 +155,7 @@
     <ClInclude Include="Shader.h" />
     <ClInclude Include="Sphere.hpp" />
     <ClInclude Include="stb_image.hpp" />
+    <ClInclude Include="Sun.hpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

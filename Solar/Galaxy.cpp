@@ -1,7 +1,11 @@
 #include "Galaxy.hpp"
 
-Galaxy::Galaxy(Planet& sun) {
-	addPlanet(sun);
+Galaxy::Galaxy() {
+
+}
+
+Galaxy::Galaxy(Sun& _sun) {
+	sun = _sun;
 }
 
 void Galaxy::addPlanet(Planet& planet) {
@@ -9,16 +13,20 @@ void Galaxy::addPlanet(Planet& planet) {
 }
 
 void Galaxy::renderGalaxy(Shader& planetShader, Shader& sunShader, float deltaTime) {
-	for (int i = 1; i < planets.size(); i++) {
+	sunShader.use();
+	sun.renderCenter(sunShader);
+	for (int i = 0; i < planets.size(); i++) {
 		planets[i].orbit(deltaTime);
 	}
-	
-	sunShader.use();
-	planets[0].render(sunShader);
+	glEnable(GL_DEPTH_TEST);
 
 	planetShader.use();
-	for (int i = 1; i < planets.size(); i++) {
+	// bind textures on corresponding texture units
+
+	for (int i = 0; i < planets.size(); i++) {
 		planets[i].render(planetShader);
 	}
 
+	sunShader.use();
+	sun.renderGlow(sunShader);
 }
