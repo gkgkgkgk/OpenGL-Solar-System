@@ -67,7 +67,7 @@ int main()
 	Planet p = Planet(5.972e24, 0.2, 150e6, "./assets/Martian.png", sun);
 	galaxy.addPlanet(p);
 
-	Planet p2 = Planet(5.972e24, 0.1, 48e6, "./assets/Terrestrial4.png", sun);
+	Planet p2 = Planet(5.972e24, 0.15, 48e6, "./assets/Terrestrial4.png", sun);
 	galaxy.addPlanet(p2);
 	
 	Planet p3 = Planet(5.972e24, 0.3, 96e6, "./assets/Gaseous1.png", sun);
@@ -75,6 +75,9 @@ int main()
 
 	Planet p4 = Planet(5.972e24, 0.25, 200e6, "./assets/Icy.png", sun);
 	galaxy.addPlanet(p4);
+
+	Planet p5 = Planet(5.972e24, 0.1, 65e6, "./assets/Volcanic.png", sun);
+	galaxy.addPlanet(p5);
 
 	glm::mat4 model = glm::mat4(1.0f);
 

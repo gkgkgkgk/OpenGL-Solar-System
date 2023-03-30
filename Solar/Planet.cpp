@@ -13,14 +13,14 @@ Planet::Planet(float _mass, float _radius, float _orbitRadius, std::string textu
 	orbitRadius = _orbitRadius;
 	orbitSpeed = sqrt(sun.mass * G / pow(orbitRadius, 3));
     loadTexture(texturePath);
-    rotateSpeed = ((rand() % 100) + 1)/ 10;
+    rotateSpeed = _radius * 10;
 }
 
 void Planet::orbit(float deltaTime) {
 	position.x = orbitRadius * cos(position.w) / 2e7;
 	position.z = orbitRadius * sin(position.w) / 2e7;
 
-	position.w += orbitSpeed * deltaTime * 10;
+	position.w += orbitSpeed * deltaTime * 20;
     angle += rotateSpeed * deltaTime;
 }
 
