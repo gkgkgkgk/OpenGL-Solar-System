@@ -54,7 +54,7 @@ int main()
 	Shader skyShader("./sky.vertexshader", "./sky.fragmentshader");
 	Shader planetShader("./vert.vertexshader", "./frag.fragmentshader");
 	Shader sunShader("./sun.vertexshader", "./sun.fragmentshader");
-	Shader depthShader("./depth.vertexshader", "./depth.fragmentshader");
+	Shader depthShader("./depth.vertexshader", "./depth.fragmentshader", "./depth.geometryshader");
 
 	glEnable(GL_DEPTH_TEST);
 	glfwSetCursorPosCallback(window, mouse_callback);
@@ -87,20 +87,23 @@ int main()
 	camera.initializeSkybox(skyShader);
 	Galaxy galaxy = Galaxy(sun);
 
-	Planet p = Planet(5.972e24, 0.2, 150e6, "./assets/Martian.png", sun);
+	Planet p = Planet(5.972e24, 0.2, 125e6, "./assets/Martian.png", sun);
 	galaxy.addPlanet(p);
 
-	Planet p2 = Planet(5.972e24, 0.15, 48e6, "./assets/Terrestrial4.png", sun);
+	Planet p2 = Planet(5.972e24, 0.15, 45e6, "./assets/Terrestrial4.png", sun);
 	galaxy.addPlanet(p2);
 	
-	Planet p3 = Planet(5.972e24, 0.3, 96e6, "./assets/Gaseous1.png", sun);
+	Planet p3 = Planet(5.972e24, 0.3, 75e6, "./assets/Gaseous1.png", sun);
 	galaxy.addPlanet(p3);
 
 	Planet p4 = Planet(5.972e24, 0.25, 200e6, "./assets/Icy.png", sun);
 	galaxy.addPlanet(p4);
 
-	Planet p5 = Planet(5.972e24, 0.1, 65e6, "./assets/Volcanic.png", sun);
+	Planet p5 = Planet(5.972e24, 0.1, 55e6, "./assets/Volcanic.png", sun);
 	galaxy.addPlanet(p5);
+
+	Planet p6 = Planet(5.972e24, 0.4, 150e6, "./assets/Gaseous4.png", sun);
+	galaxy.addPlanet(p6);
 
 	glm::mat4 model = glm::mat4(1.0f);
 
@@ -121,7 +124,7 @@ int main()
 		// SHADOWS
 		// -----------------------------------------------
 		float near_plane = 0.1f;
-		float far_plane = 50.0f;
+		float far_plane = 25.0;
 		glm::mat4 shadowProj = glm::perspective(glm::radians(90.0f), (float)SHADOW_WIDTH / (float)SHADOW_HEIGHT, near_plane, far_plane);
 		std::vector<glm::mat4> shadowTransforms;
 		shadowTransforms.push_back(shadowProj * glm::lookAt(glm::vec3(0.0), glm::vec3(0.0) + glm::vec3(1.0f, 0.0f, 0.0f), glm::vec3(0.0f, -1.0f, 0.0f)));

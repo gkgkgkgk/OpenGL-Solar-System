@@ -26,7 +26,6 @@ void Galaxy::renderGalaxy(Shader& planetShader, Shader& sunShader, unsigned int 
 		for (int i = 0; i < planets.size(); i++) {
 			planets[i].orbit(deltaTime);
 		}
-		glEnable(GL_DEPTH_TEST);
 
 		planetShader.use();
 
