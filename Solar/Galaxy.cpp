@@ -12,21 +12,30 @@ void Galaxy::addPlanet(Planet& planet) {
 	this->planets.push_back(planet);
 }
 
-void Galaxy::renderGalaxy(Shader& planetShader, Shader& sunShader, float deltaTime) {
-	sunShader.use();
-	sun.renderCenter(sunShader);
-	for (int i = 0; i < planets.size(); i++) {
-		planets[i].orbit(deltaTime);
+void Galaxy::renderGalaxy(Shader& planetShader, Shader& sunShader, unsigned int depthCubeMap, float deltaTime) {
+	if (depthCubeMap == -1) {
+		planetShader.use();
+
+		for (int i = 0; i < planets.size(); i++) {
+			planets[i].render(planetShader, depthCubeMap);
+		}
 	}
-	glEnable(GL_DEPTH_TEST);
+	else {
+		sunShader.use();
+		sun.renderCenter(sunShader);
+		for (int i = 0; i < planets.size(); i++) {
+			planets[i].orbit(deltaTime);
+		}
+		glEnable(GL_DEPTH_TEST);
 
-	planetShader.use();
-	// bind textures on corresponding texture units
+		planetShader.use();
 
-	for (int i = 0; i < planets.size(); i++) {
-		planets[i].render(planetShader);
+
+		for (int i = 0; i < planets.size(); i++) {
+			planets[i].render(planetShader, depthCubeMap);
+		}
+
+		sunShader.use();
+		sun.renderGlow(sunShader);
 	}
-
-	sunShader.use();
-	sun.renderGlow(sunShader);
 }

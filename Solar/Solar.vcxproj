@@ -141,6 +141,9 @@
     <ClCompile Include="Sun.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="depth.fragmentshader" />
+    <None Include="depth.geometryshader" />
+    <None Include="depth.vertexshader" />
     <None Include="frag.fragmentshader" />
     <None Include="sky.fragmentshader" />
     <None Include="sky.vertexshader" />

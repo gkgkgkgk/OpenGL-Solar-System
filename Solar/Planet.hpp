@@ -30,7 +30,7 @@ public:
 	Planet(float mass, float radius);
 	Planet(float mass, float radius, float orbitRadius, std::string texturePath, Sun &sun);
 	void orbit(float deltaTime);
-	void render(Shader &shader);
+	void render(Shader &shader, unsigned int depthCubeMap);
 	void loadTexture(std::string texturePath);
 
 private:

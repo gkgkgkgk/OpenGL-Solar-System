@@ -24,15 +24,23 @@ void Planet::orbit(float deltaTime) {
     angle += rotateSpeed * deltaTime;
 }
 
-void Planet::render(Shader & shader) {
+void Planet::render(Shader & shader, unsigned int depthCubeMap) {
     glm::mat4 translate = glm::translate(glm::mat4(1), glm::vec3(position.x, position.y, position.z));
     translate = glm::rotate(translate, angle, glm::vec3(0, 1, 0));
 
 	shader.setMat4("model", translate);
-    glActiveTexture(GL_TEXTURE1);
+    shader.setInt("texture1", 0);
+
+    if (depthCubeMap >= 0) {
+        glActiveTexture(GL_TEXTURE2);
+        glBindTexture(GL_TEXTURE_CUBE_MAP, depthCubeMap);
+        shader.setInt("depthMap", 2);
+    }
+
+    glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D, texture);
-    shader.setInt("texture1", 1);
-	sphere.renderSphere();
+	
+    sphere.renderSphere();
 }
 
 void Planet::loadTexture(std::string texturePath) {
